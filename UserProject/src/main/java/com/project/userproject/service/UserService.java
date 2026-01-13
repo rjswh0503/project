@@ -1,0 +1,88 @@
+package com.project.userproject.service;
+
+import com.project.userproject.dto.LoginRequest;
+import com.project.userproject.dto.RegisterRequest;
+import com.project.userproject.entity.Department;
+import com.project.userproject.entity.Employee;
+import com.project.userproject.entity.Role;
+import com.project.userproject.entity.User;
+import com.project.userproject.repository.DepartmentRepository;
+import com.project.userproject.repository.EmployeeRepository;
+import com.project.userproject.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+
+    // 1. 사원 등록 (무조건 USER, 비번 1111)
+
+    @Transactional
+    public void registerUser(RegisterRequest request){
+        if(userRepository.existsByEmployeeNo(request.getEmployeeNo())){
+            throw new IllegalArgumentException("이미 존재하는 사번입니다.");
+        }
+
+        System.out.println(">>> 직급(position) 값 확인: " + request.getPosition());
+        System.out.println(">>> 부서번호(departNo) 값 확인: " + request.getDepartNo());
+
+
+
+        User user = User.builder()
+                .employeeNo(request.getEmployeeNo())
+                .password("1111")
+                .role(Role.USER)
+                .isActive(true)
+                .mustChangePassword(true)
+                .build();
+
+      User savedUser = userRepository.save(user);
+
+
+        Department dept = departmentRepository.findById(request.getDepartNo()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 부서 코드입니다."));
+
+
+
+
+
+
+
+
+        Employee employee = Employee.builder()
+                .user(savedUser)
+                .employeeNo(request.getEmployeeNo())
+                .name(request.getName())
+                .department(dept)
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .position(request.getPosition())
+                .joinDate(request.getJoinDate())
+                .build();
+
+        employeeRepository.save(employee);
+
+    }
+
+
+
+    // 2. 사원 로그인 (성공 시 시간 업데이트 )
+    // 나중에 비밀번호 변경
+
+    @Transactional
+    public User login(LoginRequest request){
+        User user = userRepository.findByEmployeeNo(request.getEmployeeNo()).orElse(null);
+
+        if(user == null || !user.getPassword().equals(request.getPassword()) || !user.isActive()){
+            return null;
+        }
+        user.updateLastLogin(); // 마지막 로그인 시간 갱신
+        return user;
+    }
+
+}

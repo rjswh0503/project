@@ -1,0 +1,168 @@
+package com.example.demo.dto;
+
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDate;
+import java.util.Date;
+
+@Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    public Long getId() {
+		return id;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public String getEmployeeNo() {
+		return employeeNo;
+	}
+
+
+	public void setEmployeeNo(String employeeNo) {
+		this.employeeNo = employeeNo;
+	}
+
+
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
+	public String getPassword() {
+		return password;
+	}
+
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+	public String getDepartment() {
+		return department;
+	}
+
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+
+	public String getPosition() {
+		return position;
+	}
+
+
+	public void setPosition(String position) {
+		this.position = position;
+	}
+
+
+	public String getRole() {
+		return role;
+	}
+
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+
+	public LocalDate getJoin_date() {
+		return join_date;
+	}
+
+
+	public void setJoin_date(LocalDate join_date) {
+		this.join_date = join_date;
+	}
+
+
+	public LocalDate getCreated_at() {
+		return created_at;
+	}
+
+
+	public void setCreated_at(LocalDate created_at) {
+		this.created_at = created_at;
+	}
+
+
+	public LocalDate getUpdated_at() {
+		return updated_at;
+	}
+
+
+	public void setUpdated_at(LocalDate updated_at) {
+		this.updated_at = updated_at;
+	}
+
+
+	@Column(nullable = false, name = "employee_no", unique = true)
+    private String employeeNo;
+
+    @Column(name = "user_name")
+    private String name;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String department;
+
+    @Column(nullable = false)
+    private String position;
+
+    @Builder.Default // 빌더를 통해 생성할 때도 기본값을 유지함
+    @Column(nullable = false)
+    private String role = "User";
+
+
+    // @CreationTimestamp DB에 INSERT 될 때 현재 시간이 자동으로 들어감
+
+    @CreationTimestamp
+    private LocalDate join_date;
+
+    @CreationTimestamp
+    private LocalDate created_at;
+
+
+    @CreationTimestamp
+    private LocalDate updated_at;
+
+
+	
+
+	
+
+
+
+}
