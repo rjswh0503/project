@@ -29,8 +29,7 @@ public class UserService {
             throw new IllegalArgumentException("이미 존재하는 사번입니다.");
         }
 
-        System.out.println(">>> 직급(position) 값 확인: " + request.getPosition());
-        System.out.println(">>> 부서번호(departNo) 값 확인: " + request.getDepartNo());
+
 
 
 
@@ -47,13 +46,6 @@ public class UserService {
 
         Department dept = departmentRepository.findById(request.getDepartNo()).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 부서 코드입니다."));
 
-
-
-
-
-
-
-
         Employee employee = Employee.builder()
                 .user(savedUser)
                 .employeeNo(request.getEmployeeNo())
@@ -68,8 +60,6 @@ public class UserService {
         employeeRepository.save(employee);
 
     }
-
-
 
     // 2. 사원 로그인 (성공 시 시간 업데이트 )
     // 나중에 비밀번호 변경
