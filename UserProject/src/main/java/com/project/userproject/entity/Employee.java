@@ -23,7 +23,7 @@ public class Employee {
     @Column(name = "employeeId")
     private Long id;
 
-    // 수정: 컬럼명 소문자 규칙 적용 (UserId -> user_id)
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false)
     private User user;
@@ -49,8 +49,7 @@ public class Employee {
     @Column(name = "join_date")
     private LocalDate joinDate;
 
-    // 팁: 필드명은 camelCase가 Java 관례입니다 (resignation_date -> resignationDate)
-    // DB 컬럼명은 @Column으로 지정하면 됩니다.
+
     @Column(name = "resignation_date")
     private LocalDate resignationDate;
 

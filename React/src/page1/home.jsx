@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
-import { Badge, Avatar } from 'flowbite-react';
-import { 
-  HiLogout, HiUserAdd, HiHome, HiUserCircle, HiChevronRight, 
-  HiMail, HiPhone, HiIdentification, HiBriefcase, HiCalendar, HiShieldCheck
-} from 'react-icons/hi';
+import Register from './register';
 
 function Home() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('record');
+    const [activeMenu, setActiveMenu] = useState('home'); // 현재 활성화된 메뉴 (home, attendance, profile, etc.)
     const navigate = useNavigate();
 
     const today = new Date();
@@ -32,180 +28,183 @@ function Home() {
         try {
             await api.post('/api/logout');
             navigate('/login');
-        } catch (err) {
-            navigate('/login');
-        }
+        } catch (err) { navigate('/login'); }
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-[#F6F6F6]">
-            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900 mb-4"></div>
-            <p className="text-sm font-bold text-gray-500 uppercase tracking-widest">System Initializing...</p>
+        <div className="flex items-center justify-center min-h-screen bg-[#F6F6F6]">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-gray-900"></div>
+        </div>
+    );
+
+    const isAdmin = user?.role === 'ADMIN';
+    const isUser = user?.role === 'USER';
+
+    // 메인 홈 화면 컴포넌트
+    const HomeDashboard = () => (
+        <div className="space-y-6">
+            <div className='grid grid-cols-3 gap-6'>
+                {/* 내 근태 요약 */}
+                <div className='bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm'>
+                    <p className='text-xs text-gray-400 font-bold uppercase mb-4'>오늘 출근</p>
+                    <p className='text-3xl font-black text-blue-500'>08:52</p>
+                    <p className='text-[11px] text-gray-400 mt-2'>정상 출근입니다.</p>
+                </div>
+                {/* 잔여 연차 */}
+                <div className='bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm'>
+                    <p className='text-xs text-gray-400 font-bold uppercase mb-4'>잔여 연차</p>
+                    <p className='text-3xl font-black text-gray-800'>12.5 <span className='text-lg'>일</span></p>
+                </div>
+                {/* 근무 시간 */}
+                <div className='bg-white p-6 rounded-[28px] border border-gray-100 shadow-sm'>
+                    <p className='text-xs text-gray-400 font-bold uppercase mb-4'>이번 주 근무</p>
+                    <p className='text-3xl font-black text-gray-800'>32h 15m</p>
+                </div>
+            </div>
+
+            <div className='grid grid-cols-2 gap-6'>
+                {/* 공지사항 카드 */}
+                <div className='bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm'>
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className='font-black text-lg'>공지사항</h3>
+                        <button className='text-xs text-gray-400 hover:text-gray-600 font-bold'>더보기 +</button>
+                    </div>
+                    <ul className='space-y-4'>
+                        <li className='flex items-center justify-between text-sm group cursor-pointer'>
+                            <span className='text-gray-600 group-hover:text-blue-500 transition-colors'>[필독] 2026년 설 연휴 휴무 안내</span>
+                            <span className='text-gray-300 text-xs'>01.12</span>
+                        </li>
+                        <li className='flex items-center justify-between text-sm group cursor-pointer'>
+                            <span className='text-gray-600 group-hover:text-blue-500 transition-colors'>사내 식당 메뉴 개편 안내</span>
+                            <span className='text-gray-300 text-xs'>01.10</span>
+                        </li>
+                        <li className='flex items-center justify-between text-sm group cursor-pointer'>
+                            <span className='text-gray-600 group-hover:text-blue-500 transition-colors'>보안 소프트웨어 업데이트 공지</span>
+                            <span className='text-gray-300 text-xs'>01.08</span>
+                        </li>
+                    </ul>
+                </div>
+
+                {/* 내 할 일 (To-do) 카드 */}
+                <div className='bg-[#F8F9FA] p-8 rounded-[32px] border border-gray-100 shadow-sm'>
+                    <h3 className='font-black text-lg mb-6'>나의 할 일</h3>
+                    <div className='space-y-3'>
+                        {['주간 보고서 작성', '오후 2시 클라이언트 미팅', '연차 신청 승인 확인'].map((task, i) => (
+                            <div key={i} className='flex items-center gap-3 bg-white p-4 rounded-2xl shadow-sm'>
+                                <input type="checkbox" className='w-4 h-4 rounded-full accent-blue-500 cursor-pointer' />
+                                <span className='text-sm font-medium text-gray-700'>{task}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
         </div>
     );
 
     return (
-        <div className="flex min-h-screen bg-[#F3F4F6] font-sans text-gray-900">
-            
-            {/* --- 사이드바: 정갈한 크기로 조정 --- */}
-            <aside className="hidden lg:flex flex-col w-64 bg-[#111827] text-white fixed h-full z-30 shadow-xl">
-                <div className="p-6 h-20 flex items-center border-b border-gray-800">
-                    <span className="text-xl font-black tracking-tight italic text-blue-500">HR PORTAL</span>
+        <div className='flex min-h-screen bg-[#E9ECEF] font-sans p-4 gap-4'>
+            {/* 1. 사이드바 - 빨간색 제거 세련된 디자인 */}
+            <aside className='w-[280px] bg-[#212529] text-white p-8 flex flex-col rounded-[32px] shadow-2xl'>
+                <div className="flex items-center gap-4 mb-12">
+                    <div className="w-10 h-10 bg-[#343A40] rounded-xl flex items-center justify-center text-lg font-bold text-blue-400">H</div>
+                    <h2 className='text-xl font-bold tracking-tight'>HR System</h2>
                 </div>
-                
-                <nav className="flex-1 p-4 space-y-1">
-                    <SidebarItem 
-                        icon={<HiHome className="text-lg" />} 
-                        label="대시보드 메인" 
-                        isActive={activeTab === 'record'} 
-                        onClick={() => setActiveTab('record')} 
-                    />
-                    <SidebarItem 
-                        icon={<HiUserCircle className="text-lg" />} 
-                        label="내 정보 관리" 
-                        isActive={activeTab === 'info'} 
-                        onClick={() => setActiveTab('info')} 
-                    />
-                    {user?.role === 'ADMIN' && (
-                        <div className="mt-8 border-t border-gray-800 pt-6">
-                            <p className="px-4 text-[10px] font-bold text-gray-500 uppercase mb-2 tracking-widest">Admin Menu</p>
-                            <Link to="/admin/register">
-                                <SidebarItem icon={<HiUserAdd className="text-lg" />} label="신규 사원 등록" />
-                            </Link>
+
+                <nav className='flex-1 space-y-2'>
+                    <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] px-4 mb-4 italic">Overview</p>
+                    <button onClick={() => setActiveMenu('home')}
+                        className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'home' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                        대시보드 홈
+                    </button>
+                    {isUser && (
+                        <button onClick={() => setActiveMenu('attendance')}
+                            className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'attendance' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                            내 근태 현황
+                        </button>
+                    )}
+                    {!isAdmin && (
+                        <button onClick={() => setActiveMenu('profile')}
+                            className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'profile' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                            내 정보
+                        </button>
+                    )}
+
+                    {isAdmin && (
+                        <div className="pt-8 space-y-2">
+                            <p className="text-[10px] text-gray-500 font-black uppercase tracking-[0.2em] px-4 mb-4 italic">Management</p>
+                            <button onClick={() => setActiveMenu('manage-users')}
+                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'manage-users' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                                사원 목록 관리
+                            </button>
+                            <button onClick={() => setActiveMenu('manage-attendance')}
+                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'manage-attendance' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                                전체 근태 조회
+                            </button>
+                            <button onClick={() => setActiveMenu('manage-register')}
+                                className={`w-full text-left px-4 py-3 rounded-2xl transition-all duration-200 ${activeMenu === 'manage-register' ? 'bg-[#343A40] text-white shadow-lg' : 'text-gray-500 hover:text-gray-300'}`}>
+                                사원 등록
+                            </button>
                         </div>
                     )}
                 </nav>
 
-                <div className="p-6 border-t border-gray-800">
-                    <button onClick={handleLogout} className="flex items-center text-sm font-bold text-gray-400 hover:text-white transition-colors w-full px-4 py-2">
-                        <HiLogout className="mr-3 text-lg" /> 로그아웃
-                    </button>
-                </div>
+                <button onClick={handleLogout} className='mt-auto py-4 bg-[#343A40] hover:bg-gray-700 text-gray-300 hover:text-white rounded-2xl font-bold transition-all'>
+                    Logout
+                </button>
             </aside>
 
-            {/* --- 메인 영역 --- */}
-            <main className="flex-1 ml-64 min-h-screen flex flex-col">
-                <header className="bg-white border-b border-gray-200 h-20 px-10 flex justify-between items-center sticky top-0 z-20 shadow-sm">
-                    <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">
-                        {activeTab === 'record' ? 'Dashboard Overview' : 'Employee Master Record'}
-                    </h2>
-                    <div className="flex items-center gap-6">
-                        <div className="text-right border-r pr-6 border-gray-100">
-                            <p className="text-sm font-black text-gray-900">{user?.name} {user?.position}</p>
-                            <p className="text-[10px] font-bold text-gray-400 tracking-wider">{user?.employeeNo}</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <span className="text-xs font-bold text-gray-400">{dateString}</span>
-                            <Avatar placeholderInitials={user?.name?.charAt(0)} rounded size="sm" />
-                        </div>
-                    </div>
+            {/* 2. 메인 컨텐츠 영역 */}
+            <main className='flex-1 p-10 overflow-y-auto bg-white rounded-[32px] shadow-xl relative'>
+                <header className='mb-10'>
+                    <p className='text-gray-400 font-semibold mb-1'>{dateString}</p>
+                    <h1 className='text-3xl font-black text-[#212529]'>
+                        {isAdmin ? '관리자님,' : `${user?.name} ${user?.position || '사원'}님,`} <span className="font-light text-gray-500">반가워요! 👋</span>
+                    </h1>
                 </header>
 
-                <div className="p-10 w-full max-w-[1400px] mx-auto">
-                    {activeTab === 'record' ? (
-                        /* --- 대시보드 뷰 --- */
-                        <div className="space-y-8 animate-in fade-in duration-500">
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                                <CheckCard label="입실 체크 / Check-In" time="--" btnText="출근 등록" type="in" />
-                                <CheckCard label="퇴실 체크 / Check-Out" time="--" btnText="퇴근 등록" type="out" />
-                            </div>
-                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-                                <StatCard label="이번 달 근무일" value="--" unit="일" />
-                                <StatCard label="근태 특이사항" value="--" unit="회" color="text-red-500" />
-                                <StatCard label="연차 잔여일" value="--" unit="일" />
-                                <StatCard label="초과 근로" value="--" unit="시간" />
-                            </div>
-                        </div>
-                    ) : (
-                        /* --- 내 정보 뷰 (이미지 스타일 최적화) --- */
-                        <div className="animate-in fade-in slide-in-from-bottom-3 duration-700 space-y-10">
-                            
-                            {/* 상단 프로필 배너 (크기 최적화) */}
-                            <div className="relative bg-white rounded-[32px] border border-gray-200 shadow-sm overflow-hidden min-h-[280px]">
-                                <div className="h-[180px] bg-[#1a1f2c] relative">
-                                    <div className="absolute bottom-6 left-[240px]">
-                                        <div className="flex items-center gap-3 mb-1">
-                                            <h2 className="text-3xl font-black text-white tracking-tight">{user?.name}</h2>
-                                            <Badge color="success" className="bg-[#dcfce7] text-[#166534] font-black px-2 py-0.5 rounded text-[10px]">재직중</Badge>
-                                        </div>
-                                        <p className="text-gray-400 font-bold text-sm">
-                                            {user?.position} <span className="mx-2 opacity-20 text-white">|</span> {user?.employeeNo}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="absolute top-[80px] left-12">
-                                    <div className="bg-white p-4 rounded-[40px] shadow-xl inline-block border border-gray-100">
-                                        <div className="bg-[#4a5568] w-[120px] h-[120px] rounded-[32px] flex items-center justify-center border border-gray-100">
-                                            <span className="text-white text-2xl font-black opacity-40 uppercase">{user?.name?.charAt(0)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="h-[100px] bg-white w-full"></div>
-                            </div>
+                {/* 메뉴 클릭에 따른 컨텐츠 전환 */}
+                {activeMenu === 'home' && <HomeDashboard />}
 
-                            {/* 상세 데이터 그리드 */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-                                <InfoField label="공식 이메일" value={user?.email} icon={<HiMail />} />
-                                <InfoField label="연락처 (MOBILE)" value={user?.phone} icon={<HiPhone />} />
-                                <InfoField label="사원 번호" value={user?.employeeNo} icon={<HiIdentification />} />
-                                <InfoField label="입사 일자" value={user?.joinDate} icon={<HiCalendar />} />
-                            </div>
+                {activeMenu === 'attendance' && (
+                    <div className="bg-[#F8F9FA] p-8 rounded-[32px]">
+                        <h2 className="text-xl font-black mb-6">나의 상세 근태기록</h2>
+                        {/* 이전 테이블 코드 넣는 자리 */}
+                        <p className="text-gray-400 text-sm">상세 테이블은 이전 버전과 동일하게 렌더링됩니다.</p>
+                    </div>
+                )}
+
+                {activeMenu === 'profile' && (
+                    <div className="bg-[#F8F9FA] p-8 rounded-[32px]">
+                        <h2 className="text-xl font-black mb-6">내 정보 수정</h2>
+                        <div className="max-w-md space-y-4">
+                            <div><label className="text-xs font-bold text-gray-400 block mb-2">이름</label><input type="text" className="w-full p-4 rounded-2xl bg-white border-none shadow-sm" defaultValue={user?.name} /></div>
+                            <div><label className="text-xs font-bold text-gray-400 block mb-2">새 비밀번호</label><input type="password" className="w-full p-4 rounded-2xl bg-white border-none shadow-sm" placeholder="••••••••" /></div>
+                            <button className="w-full py-4 bg-[#101112] hover:bg-[#212529] text-white rounded-2xl font-bold mt-4 shadow-lg hover:cursor-pointer">정보 저장하기</button>
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
+
+                {activeMenu === 'manage-attendance' && (
+                    <div className="bg-[#F8F9FA] p-8 rounded-[32px]">
+                        <h2 className="text-xl font-black mb-6 text-blue-600">전체 사원 근태 조회 (Admin)</h2>
+
+                        {/* 관리자 전용 확장 테이블 자리 */}
+                    </div>
+                )}
+
+                {activeMenu === 'manage-register' && (
+                    <div className="bg-[#F8F9FA] p-8 rounded-[32px]">
+                        <h2 className="text-xl font-black mb-6 text-blue-600">사원 등록
+                        </h2>
+
+                        <div>
+                            <Register />
+                        </div>
+                    </div>
+                )}
+
+
             </main>
-        </div>
-    );
-}
-
-// --- 표준 컴포넌트 ---
-
-function SidebarItem({ icon, label, isActive, onClick }) {
-    return (
-        <button 
-            onClick={onClick}
-            className={`flex items-center w-full px-5 py-3 rounded-xl text-sm font-bold transition-all ${isActive ? 'bg-white text-black shadow-md' : 'text-gray-500 hover:text-white hover:bg-gray-800'}`}
-        >
-            <span className="mr-3">{icon}</span>
-            {label}
-        </button>
-    );
-}
-
-function CheckCard({ label, time, btnText, type }) {
-    return (
-        <div className="bg-white border border-gray-200 p-8 rounded-[24px] flex justify-between items-center shadow-sm">
-            <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">{label}</p>
-                <p className={`text-4xl font-black ${type === 'in' ? 'text-gray-900' : 'text-gray-200'}`}>{time}</p>
-            </div>
-            <button className={`px-8 py-3 rounded-xl font-black text-sm transition-all active:scale-95 ${type === 'in' ? 'bg-black text-white hover:bg-gray-800 shadow-lg shadow-black/10' : 'bg-gray-50 text-gray-300 border border-gray-100 cursor-not-allowed'}`}>
-                {btnText}
-            </button>
-        </div>
-    );
-}
-
-function StatCard({ label, value, unit, color = "text-gray-900" }) {
-    return (
-        <div className="bg-white border border-gray-200 p-8 rounded-[24px] shadow-sm">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">{label}</p>
-            <p className={`text-3xl font-black ${color}`}>
-                {value}
-                <span className="text-xs ml-1 font-bold text-gray-300 uppercase">{unit}</span>
-            </p>
-        </div>
-    );
-}
-
-function InfoField({ label, value, icon }) {
-    return (
-        <div className="bg-white p-8 rounded-[24px] border border-gray-100 shadow-sm flex items-center gap-6 group hover:border-black transition-all">
-            <div className="text-3xl text-gray-200 group-hover:text-black transition-colors">{icon}</div>
-            <div>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{label}</p>
-                <p className="text-lg font-black text-gray-900 tracking-tight">{value || '-'}</p>
-            </div>
         </div>
     );
 }

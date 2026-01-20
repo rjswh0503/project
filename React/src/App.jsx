@@ -4,6 +4,7 @@ import './index.css';
 import Login from './page1/login';
 import Register from './page1/register';
 import Home from './page1/home';
+import Good from './page1/good';
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/admin/register' element={<Register/>} />
         <Route path='/home' element={<Home/>}/>
+        <Route path='/good' element={<Good/>}/>
       </Routes>
     </BrowserRouter>
   )
