@@ -49,7 +49,6 @@ public class Employee {
     @Column(name = "join_date")
     private LocalDate joinDate;
 
-
     @Column(name = "resignation_date")
     private LocalDate resignationDate;
 

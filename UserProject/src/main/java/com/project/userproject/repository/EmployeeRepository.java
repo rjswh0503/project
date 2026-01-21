@@ -14,10 +14,12 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     List<Employee> user(User user);
 
 
-    List<Employee> findByName(String name);
+    Optional<Employee> findByName(String name);
 
+    List<Employee> findByNameContaining(String name);
 
     List<Employee> findByDepartment(String department);
+
 
 
 }
