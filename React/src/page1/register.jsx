@@ -44,19 +44,6 @@ function Register() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col items-center py-12 px-4">
       <div className="w-full max-w-3xl">
-        
-        {/* 상단 네비게이션 */}
-        <div className="flex justify-between items-center mb-10">
-          <Link to="/home" className="flex items-center text-gray-400 hover:text-black transition-colors font-bold text-sm group">
-            <HiArrowLeft className="mr-2 group-hover:-translate-x-1 transition-transform" /> 뒤로가기
-          </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black text-gray-300 uppercase tracking-widest">Admin Tool</span>
-            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-          </div>
-        </div>
-
-        {/* 메인 헤더 */}
         <div className="mb-10">
           <h1 className="text-4xl font-black text-gray-900 tracking-tight mb-3 flex items-center">
             <HiUserAdd className="mr-4 text-blue-600" /> 사원 등록

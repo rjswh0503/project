@@ -2,10 +2,7 @@ package com.project.userproject.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,7 +34,7 @@ public class User {
     private boolean isActive;
 
     @Column(name = "must_change_password")
-    private boolean mustChangePassword;
+    private boolean mustChangePassword = true;
 
     @Column(name = "last_login")
     private LocalDateTime lastLoign;
@@ -51,6 +49,11 @@ public class User {
 
     public void updateLastLogin(){
         this.lastLoign = LocalDateTime.now();
+    }
+
+
+    public void changePassword(String newPassword){
+        this.password = newPassword;
     }
 
 }
